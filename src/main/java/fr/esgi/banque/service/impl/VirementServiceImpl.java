@@ -5,9 +5,11 @@ import fr.esgi.banque.business.Virement;
 import fr.esgi.banque.service.CompteIntrouvableException;
 import fr.esgi.banque.service.CompteRepository;
 import fr.esgi.banque.service.NotificationService;
+import fr.esgi.banque.service.VirementRefuseException;
 
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -30,6 +32,10 @@ public class VirementServiceImpl {
 		if (Objects.equals(numeroSource, numeroDestination)) {
 			throw new IllegalArgumentException("Les deux comptes doivent être différents");
 		}
+		LocalDate date = LocalDate.now(horloge);
+		if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+			throw new VirementRefuseException("Les virements ne sont pas acceptés le dimanche");
+		}
 		Compte source = trouverCompte(numeroSource);
 		Compte destination = trouverCompte(numeroDestination);
 		source.debiter(montant);
@@ -39,7 +45,7 @@ public class VirementServiceImpl {
 		if (montant.compareTo(SEUIL_ALERTE) > 0) {
 			notifications.alerter(source.getTitulaire(), "Virement de " + montant.toPlainString() + " €");
 		}
-		return new Virement(numeroSource, numeroDestination, montant, LocalDate.now(horloge));
+		return new Virement(numeroSource, numeroDestination, montant, date);
 	}
 
 	private Compte trouverCompte(String numero) {
