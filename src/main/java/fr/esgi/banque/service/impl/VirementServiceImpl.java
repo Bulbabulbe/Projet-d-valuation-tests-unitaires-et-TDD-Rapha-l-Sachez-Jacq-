@@ -15,10 +15,12 @@ public class VirementServiceImpl {
 
 	private final CompteRepository repository;
 	private final Clock horloge;
+	private final NotificationService notifications;
 
 	public VirementServiceImpl(CompteRepository repository, NotificationService notifications, Clock horloge) {
 		this.repository = repository;
 		this.horloge = horloge;
+		this.notifications = notifications;
 	}
 
 	public Virement virer(String numeroSource, String numeroDestination, BigDecimal montant) {
@@ -32,6 +34,9 @@ public class VirementServiceImpl {
 		destination.crediter(montant);
 		repository.sauvegarder(source);
 		repository.sauvegarder(destination);
+		if (montant.compareTo(new BigDecimal("10000")) > 0) {
+			notifications.alerter(source.getTitulaire(), "Virement de " + montant.toPlainString() + " €");
+		}
 		return new Virement(numeroSource, numeroDestination, montant, LocalDate.now(horloge));
 	}
 
