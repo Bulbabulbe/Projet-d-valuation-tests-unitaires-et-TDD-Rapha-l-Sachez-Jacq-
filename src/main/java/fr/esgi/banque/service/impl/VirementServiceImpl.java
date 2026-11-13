@@ -1,5 +1,6 @@
 package fr.esgi.banque.service.impl;
 
+import fr.esgi.banque.business.Compte;
 import fr.esgi.banque.business.Virement;
 import fr.esgi.banque.service.CompteIntrouvableException;
 import fr.esgi.banque.service.CompteRepository;
@@ -22,9 +23,13 @@ public class VirementServiceImpl {
 		if (Objects.equals(numeroSource, numeroDestination)) {
 			throw new IllegalArgumentException("Les deux comptes doivent être différents");
 		}
-		repository.trouver(numeroSource).orElseThrow(() -> new CompteIntrouvableException(numeroSource));
-		repository.trouver(numeroDestination).orElseThrow(() -> new CompteIntrouvableException(numeroDestination));
+		trouverCompte(numeroSource);
+		trouverCompte(numeroDestination);
 		throw new UnsupportedOperationException();
+	}
+
+	private Compte trouverCompte(String numero) {
+		return repository.trouver(numero).orElseThrow(() -> new CompteIntrouvableException(numero));
 	}
 
 	private void verifierMontant(BigDecimal montant) {
