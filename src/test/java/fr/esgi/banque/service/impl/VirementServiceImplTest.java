@@ -1,5 +1,7 @@
 package fr.esgi.banque.service.impl;
 
+import fr.esgi.banque.business.Compte;
+import fr.esgi.banque.service.CompteIntrouvableException;
 import fr.esgi.banque.service.CompteRepository;
 import fr.esgi.banque.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +17,11 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class VirementServiceImplTest {
@@ -54,5 +59,27 @@ class VirementServiceImplTest {
 
 		// Act / Assert
 		assertThatIllegalArgumentException().isThrownBy(() -> service.virer("FR001", "FR001", montant));
+	}
+
+	@Test
+	void refuseUnVirementSiLeCompteSourceEstIntrouvable() {
+		// Arrange
+		when(repository.trouver("FR001")).thenReturn(Optional.empty());
+
+		// Act / Assert
+		assertThatExceptionOfType(CompteIntrouvableException.class)
+				.isThrownBy(() -> service.virer("FR001", "FR002", BigDecimal.ONE));
+	}
+
+	@Test
+	void refuseUnVirementSiLeCompteDestinationEstIntrouvable() {
+		// Arrange
+		Compte source = new Compte("FR001", "Alice", new BigDecimal("100.00"), BigDecimal.ZERO);
+		when(repository.trouver("FR001")).thenReturn(Optional.of(source));
+		when(repository.trouver("FR002")).thenReturn(Optional.empty());
+
+		// Act / Assert
+		assertThatExceptionOfType(CompteIntrouvableException.class)
+				.isThrownBy(() -> service.virer("FR001", "FR002", BigDecimal.ONE));
 	}
 }
