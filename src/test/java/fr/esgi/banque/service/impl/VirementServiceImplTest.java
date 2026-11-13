@@ -2,6 +2,7 @@ package fr.esgi.banque.service.impl;
 
 import fr.esgi.banque.service.CompteRepository;
 import fr.esgi.banque.service.NotificationService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
@@ -27,12 +28,18 @@ class VirementServiceImplTest {
 	@Mock
 	private NotificationService notifications;
 
+	private VirementServiceImpl service;
+
+	@BeforeEach
+	void preparerService() {
+		service = new VirementServiceImpl(repository, notifications, horloge);
+	}
+
 	@ParameterizedTest
 	@NullSource
 	@ValueSource(strings = {"0.00", "-0.01"})
 	void refuseUnMontantNonPositifOuAbsent(String valeur) {
 		// Arrange
-		VirementServiceImpl service = new VirementServiceImpl(repository, notifications, horloge);
 		BigDecimal montant = valeur == null ? null : new BigDecimal(valeur);
 
 		// Act / Assert
