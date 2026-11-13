@@ -1,6 +1,7 @@
 package fr.esgi.banque.service.impl;
 
 import fr.esgi.banque.business.Virement;
+import fr.esgi.banque.service.CompteIntrouvableException;
 import fr.esgi.banque.service.CompteRepository;
 import fr.esgi.banque.service.NotificationService;
 
@@ -10,7 +11,10 @@ import java.util.Objects;
 
 public class VirementServiceImpl {
 
+	private final CompteRepository repository;
+
 	public VirementServiceImpl(CompteRepository repository, NotificationService notifications, Clock horloge) {
+		this.repository = repository;
 	}
 
 	public Virement virer(String numeroSource, String numeroDestination, BigDecimal montant) {
@@ -18,6 +22,8 @@ public class VirementServiceImpl {
 		if (Objects.equals(numeroSource, numeroDestination)) {
 			throw new IllegalArgumentException("Les deux comptes doivent être différents");
 		}
+		repository.trouver(numeroSource).orElseThrow(() -> new CompteIntrouvableException(numeroSource));
+		repository.trouver(numeroDestination).orElseThrow(() -> new CompteIntrouvableException(numeroDestination));
 		throw new UnsupportedOperationException();
 	}
 
