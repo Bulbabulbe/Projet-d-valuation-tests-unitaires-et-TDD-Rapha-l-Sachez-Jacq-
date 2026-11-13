@@ -92,8 +92,7 @@ class VirementServiceImplTest {
 		// Arrange
 		Compte source = new Compte("FR001", "Alice", new BigDecimal("100.00"), BigDecimal.ZERO);
 		Compte destination = new Compte("FR002", "Bob", new BigDecimal("20.00"), BigDecimal.ZERO);
-		when(repository.trouver("FR001")).thenReturn(Optional.of(source));
-		when(repository.trouver("FR002")).thenReturn(Optional.of(destination));
+		enregistrerComptesDansLeBouchon(source, destination);
 		BigDecimal montant = new BigDecimal("30.00");
 
 		// Act
@@ -108,5 +107,10 @@ class VirementServiceImplTest {
 		assertThat(virement.numeroDestination()).isEqualTo("FR002");
 		assertThat(virement.montant()).isEqualByComparingTo(montant);
 		assertThat(virement.date()).isEqualTo(LocalDate.of(2025, 1, 6));
+	}
+
+	private void enregistrerComptesDansLeBouchon(Compte source, Compte destination) {
+		when(repository.trouver(source.getNumero())).thenReturn(Optional.of(source));
+		when(repository.trouver(destination.getNumero())).thenReturn(Optional.of(destination));
 	}
 }
