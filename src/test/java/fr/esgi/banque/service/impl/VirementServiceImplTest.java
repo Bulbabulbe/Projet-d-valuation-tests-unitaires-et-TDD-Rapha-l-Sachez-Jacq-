@@ -1,6 +1,7 @@
 package fr.esgi.banque.service.impl;
 
 import fr.esgi.banque.business.Compte;
+import fr.esgi.banque.business.SoldeInsuffisantException;
 import fr.esgi.banque.business.Virement;
 import fr.esgi.banque.service.CompteIntrouvableException;
 import fr.esgi.banque.service.CompteRepository;
@@ -24,6 +25,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -107,6 +110,22 @@ class VirementServiceImplTest {
 		assertThat(virement.numeroDestination()).isEqualTo("FR002");
 		assertThat(virement.montant()).isEqualByComparingTo(montant);
 		assertThat(virement.date()).isEqualTo(LocalDate.of(2025, 1, 6));
+	}
+
+	@Test
+	void propageLeSoldeInsuffisantSansSauvegarderNiCrediter() {
+		// Arrange
+		Compte source = new Compte("FR001", "Alice", new BigDecimal("100.00"), BigDecimal.ZERO);
+		Compte destination = new Compte("FR002", "Bob", new BigDecimal("20.00"), BigDecimal.ZERO);
+		enregistrerComptesDansLeBouchon(source, destination);
+		BigDecimal montant = new BigDecimal("100.01");
+
+		// Act / Assert
+		assertThatExceptionOfType(SoldeInsuffisantException.class)
+				.isThrownBy(() -> service.virer("FR001", "FR002", montant));
+		verify(repository, never()).sauvegarder(any());
+		assertThat(source.getSolde()).isEqualByComparingTo("100.00");
+		assertThat(destination.getSolde()).isEqualByComparingTo("20.00");
 	}
 
 	private void enregistrerComptesDansLeBouchon(Compte source, Compte destination) {
