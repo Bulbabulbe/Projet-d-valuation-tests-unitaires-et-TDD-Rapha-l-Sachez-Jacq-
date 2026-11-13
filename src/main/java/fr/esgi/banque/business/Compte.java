@@ -62,7 +62,7 @@ public class Compte {
 	}
 
 	public boolean estVide() {
-		return solde.equals(BigDecimal.ZERO);
+		return solde.signum() == 0;
 	}
 
 	public boolean estADecouvert() {
