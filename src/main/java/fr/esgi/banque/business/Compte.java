@@ -44,7 +44,7 @@ public class Compte {
 	}
 
 	public void crediter(BigDecimal montant) {
-		if (montant == null || montant.signum() < 0) {
+		if (montant == null || montant.signum() <= 0) {
 			throw new IllegalArgumentException("Le montant à créditer doit être strictement positif");
 		}
 		solde = solde.add(montant);
