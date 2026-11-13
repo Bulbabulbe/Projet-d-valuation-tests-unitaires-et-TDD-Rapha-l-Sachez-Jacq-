@@ -105,6 +105,19 @@ class CompteTest {
 		assertThat(compte.getSolde()).isEqualByComparingTo(soldeAttendu);
 	}
 
+	@ParameterizedTest
+	@CsvSource({"0, true", "0.00, true", "-0.01, false", "0.01, false"})
+	void reconnaitUnSoldeNulQuelleQueSoitSonEchelle(BigDecimal solde, boolean attendu) {
+		// Arrange
+		Compte compte = new Compte("FR001", "Alice", solde, BigDecimal.ONE);
+
+		// Act
+		boolean vide = compte.estVide();
+
+		// Assert
+		assertThat(vide).isEqualTo(attendu);
+	}
+
 	private Compte nouveauCompte() {
 		return new Compte("FR001", "Alice", new BigDecimal("100.00"), new BigDecimal("200.00"));
 	}
