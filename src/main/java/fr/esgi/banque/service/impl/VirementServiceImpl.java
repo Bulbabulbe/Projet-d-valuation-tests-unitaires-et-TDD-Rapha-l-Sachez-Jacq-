@@ -28,14 +28,8 @@ public class VirementServiceImpl {
 	}
 
 	public Virement virer(String numeroSource, String numeroDestination, BigDecimal montant) {
-		verifierMontant(montant);
-		if (Objects.equals(numeroSource, numeroDestination)) {
-			throw new IllegalArgumentException("Les deux comptes doivent être différents");
-		}
 		LocalDate date = LocalDate.now(horloge);
-		if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
-			throw new VirementRefuseException("Les virements ne sont pas acceptés le dimanche");
-		}
+		verifierVirement(numeroSource, numeroDestination, montant, date);
 		Compte source = trouverCompte(numeroSource);
 		Compte destination = trouverCompte(numeroDestination);
 		source.debiter(montant);
@@ -52,9 +46,15 @@ public class VirementServiceImpl {
 		return repository.trouver(numero).orElseThrow(() -> new CompteIntrouvableException(numero));
 	}
 
-	private void verifierMontant(BigDecimal montant) {
+	private void verifierVirement(String numeroSource, String numeroDestination, BigDecimal montant, LocalDate date) {
 		if (montant == null || montant.signum() <= 0) {
 			throw new IllegalArgumentException("Le montant du virement doit être strictement positif");
+		}
+		if (Objects.equals(numeroSource, numeroDestination)) {
+			throw new IllegalArgumentException("Les deux comptes doivent être différents");
+		}
+		if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+			throw new VirementRefuseException("Les virements ne sont pas acceptés le dimanche");
 		}
 	}
 }
