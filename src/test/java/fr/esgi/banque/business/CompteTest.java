@@ -92,6 +92,19 @@ class CompteTest {
 		assertThatIllegalArgumentException().isThrownBy(() -> compte.crediter(montant));
 	}
 
+	@ParameterizedTest
+	@CsvSource({"299.99, -199.99", "300.00, -200.00"})
+	void accepteUnDebitJusquaLaLimiteDuDecouvert(BigDecimal montant, BigDecimal soldeAttendu) {
+		// Arrange
+		Compte compte = nouveauCompte();
+
+		// Act
+		compte.debiter(montant);
+
+		// Assert
+		assertThat(compte.getSolde()).isEqualByComparingTo(soldeAttendu);
+	}
+
 	private Compte nouveauCompte() {
 		return new Compte("FR001", "Alice", new BigDecimal("100.00"), new BigDecimal("200.00"));
 	}
