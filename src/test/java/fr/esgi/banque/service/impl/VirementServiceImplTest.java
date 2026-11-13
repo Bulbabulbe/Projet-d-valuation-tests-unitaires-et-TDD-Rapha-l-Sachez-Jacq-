@@ -93,8 +93,8 @@ class VirementServiceImplTest {
 	@Test
 	void debiteCrediteEtSauvegardeLesComptesAvecLaDateDuJour() {
 		// Arrange
-		Compte source = new Compte("FR001", "Alice", new BigDecimal("100.00"), BigDecimal.ZERO);
-		Compte destination = new Compte("FR002", "Bob", new BigDecimal("20.00"), BigDecimal.ZERO);
+		Compte source = compte("FR001", "Alice", "100.00");
+		Compte destination = compte("FR002", "Bob", "20.00");
 		enregistrerComptesDansLeBouchon(source, destination);
 		BigDecimal montant = new BigDecimal("30.00");
 
@@ -115,8 +115,8 @@ class VirementServiceImplTest {
 	@Test
 	void propageLeSoldeInsuffisantSansSauvegarderNiCrediter() {
 		// Arrange
-		Compte source = new Compte("FR001", "Alice", new BigDecimal("100.00"), BigDecimal.ZERO);
-		Compte destination = new Compte("FR002", "Bob", new BigDecimal("20.00"), BigDecimal.ZERO);
+		Compte source = compte("FR001", "Alice", "100.00");
+		Compte destination = compte("FR002", "Bob", "20.00");
 		enregistrerComptesDansLeBouchon(source, destination);
 		BigDecimal montant = new BigDecimal("100.01");
 
@@ -131,5 +131,9 @@ class VirementServiceImplTest {
 	private void enregistrerComptesDansLeBouchon(Compte source, Compte destination) {
 		when(repository.trouver(source.getNumero())).thenReturn(Optional.of(source));
 		when(repository.trouver(destination.getNumero())).thenReturn(Optional.of(destination));
+	}
+
+	private Compte compte(String numero, String titulaire, String solde) {
+		return new Compte(numero, titulaire, new BigDecimal(solde), BigDecimal.ZERO);
 	}
 }
