@@ -6,6 +6,7 @@ import fr.esgi.banque.business.Virement;
 import fr.esgi.banque.service.CompteIntrouvableException;
 import fr.esgi.banque.service.CompteRepository;
 import fr.esgi.banque.service.NotificationService;
+import fr.esgi.banque.service.VirementRefuseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -152,6 +153,19 @@ class VirementServiceImplTest {
 		service.virer("FR001", "FR002", new BigDecimal("10000.00"));
 
 		// Assert
+		verifyNoInteractions(notifications);
+	}
+
+	@Test
+	void refuseUnVirementLeDimancheSansSauvegarder() {
+		// Arrange
+		Clock dimanche = Clock.fixed(Instant.parse("2025-01-05T12:00:00Z"), ZoneOffset.UTC);
+		VirementServiceImpl serviceDuDimanche = new VirementServiceImpl(repository, notifications, dimanche);
+
+		// Act / Assert
+		assertThatExceptionOfType(VirementRefuseException.class)
+				.isThrownBy(() -> serviceDuDimanche.virer("FR001", "FR002", BigDecimal.ONE));
+		verify(repository, never()).sauvegarder(any());
 		verifyNoInteractions(notifications);
 	}
 
