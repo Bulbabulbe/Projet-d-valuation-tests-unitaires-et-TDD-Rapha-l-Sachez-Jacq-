@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -126,6 +127,30 @@ class VirementServiceImplTest {
 		verify(repository, never()).sauvegarder(any());
 		assertThat(source.getSolde()).isEqualByComparingTo("100.00");
 		assertThat(destination.getSolde()).isEqualByComparingTo("20.00");
+	}
+
+	@Test
+	void alerteLeTitulaireSourceAuDelaDeDixMilleEuros() {
+		// Arrange
+		enregistrerComptesDansLeBouchon(compte("FR001", "Alice", "20000"), compte("FR002", "Bob", "0"));
+
+		// Act
+		service.virer("FR001", "FR002", new BigDecimal("10000.01"));
+
+		// Assert
+		verify(notifications).alerter(org.mockito.ArgumentMatchers.eq("Alice"), org.mockito.ArgumentMatchers.anyString());
+	}
+
+	@Test
+	void neDeclenchePasDAlerteADixMilleEuros() {
+		// Arrange
+		enregistrerComptesDansLeBouchon(compte("FR001", "Alice", "20000"), compte("FR002", "Bob", "0"));
+
+		// Act
+		service.virer("FR001", "FR002", new BigDecimal("10000.00"));
+
+		// Assert
+		verifyNoInteractions(notifications);
 	}
 
 	private void enregistrerComptesDansLeBouchon(Compte source, Compte destination) {
