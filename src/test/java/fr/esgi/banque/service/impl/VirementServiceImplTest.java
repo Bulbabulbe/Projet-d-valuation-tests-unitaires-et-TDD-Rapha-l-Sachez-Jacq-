@@ -26,6 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -138,7 +140,7 @@ class VirementServiceImplTest {
 		service.virer("FR001", "FR002", new BigDecimal("10000.01"));
 
 		// Assert
-		verify(notifications).alerter(org.mockito.ArgumentMatchers.eq("Alice"), org.mockito.ArgumentMatchers.anyString());
+		verify(notifications).alerter(eq("Alice"), anyString());
 	}
 
 	@Test
