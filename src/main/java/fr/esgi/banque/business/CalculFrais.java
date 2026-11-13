@@ -30,7 +30,7 @@ public class CalculFrais {
 		if (soldeMoyen == null) {
 			throw new IllegalArgumentException("Le solde moyen est obligatoire");
 		}
-		if (ageTitulaire <= AGE_JEUNE) {
+		if (ageTitulaire < AGE_JEUNE) {
 			return BigDecimal.ZERO;
 		}
 		if (soldeMoyen.compareTo(SEUIL_GRATUITE) > 0) {
