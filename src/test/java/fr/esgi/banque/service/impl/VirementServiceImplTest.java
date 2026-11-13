@@ -3,6 +3,7 @@ package fr.esgi.banque.service.impl;
 import fr.esgi.banque.service.CompteRepository;
 import fr.esgi.banque.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
@@ -44,5 +45,14 @@ class VirementServiceImplTest {
 
 		// Act / Assert
 		assertThatIllegalArgumentException().isThrownBy(() -> service.virer("FR001", "FR002", montant));
+	}
+
+	@Test
+	void refuseUnVirementVersLeMemeCompte() {
+		// Arrange
+		BigDecimal montant = BigDecimal.ONE;
+
+		// Act / Assert
+		assertThatIllegalArgumentException().isThrownBy(() -> service.virer("FR001", "FR001", montant));
 	}
 }
