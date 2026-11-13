@@ -80,6 +80,18 @@ class CompteTest {
 		assertThat(aDecouvert).isEqualTo(attendu);
 	}
 
+	@ParameterizedTest
+	@NullSource
+	@ValueSource(strings = {"-0.01", "0.00"})
+	void refuseUnCreditSansMontantStrictementPositif(String valeur) {
+		// Arrange
+		Compte compte = nouveauCompte();
+		BigDecimal montant = valeur == null ? null : new BigDecimal(valeur);
+
+		// Act / Assert
+		assertThatIllegalArgumentException().isThrownBy(() -> compte.crediter(montant));
+	}
+
 	private Compte nouveauCompte() {
 		return new Compte("FR001", "Alice", new BigDecimal("100.00"), new BigDecimal("200.00"));
 	}
