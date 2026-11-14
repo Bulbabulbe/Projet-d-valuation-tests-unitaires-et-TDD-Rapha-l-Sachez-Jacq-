@@ -172,6 +172,24 @@ class VirementServiceImplTest {
 		verifyNoInteractions(notifications);
 	}
 
+	@Test
+	void accepteUnVirementLeSamedi() {
+		// Arrange
+		Clock samedi = Clock.fixed(Instant.parse("2025-01-04T12:00:00Z"), ZoneOffset.UTC);
+		VirementServiceImpl serviceDuSamedi = new VirementServiceImpl(repository, notifications, samedi);
+		Compte source = compte("FR001", "Alice", "100.00");
+		Compte destination = compte("FR002", "Bob", "0");
+		enregistrerComptesDansLeBouchon(source, destination);
+
+		// Act
+		Virement virement = serviceDuSamedi.virer("FR001", "FR002", BigDecimal.TEN);
+
+		// Assert
+		assertThat(virement.date()).isEqualTo(LocalDate.of(2025, 1, 4));
+		verify(repository).sauvegarder(source);
+		verify(repository).sauvegarder(destination);
+	}
+
 	private void enregistrerComptesDansLeBouchon(Compte source, Compte destination) {
 		when(repository.trouver(source.getNumero())).thenReturn(Optional.of(source));
 		when(repository.trouver(destination.getNumero())).thenReturn(Optional.of(destination));
