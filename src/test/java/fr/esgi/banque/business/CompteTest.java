@@ -44,6 +44,18 @@ class CompteTest {
 		assertThatIllegalArgumentException().isThrownBy(() -> new Compte("FR001", "Alice", solde, decouvert));
 	}
 
+	@Test
+	void accepteUnDecouvertAutoriseNul() {
+		// Act
+		Compte compte = new Compte("FR001", "Alice", new BigDecimal("100.00"), new BigDecimal("0.00"));
+
+		// Assert
+		assertThat(compte.getNumero()).isEqualTo("FR001");
+		assertThat(compte.getTitulaire()).isEqualTo("Alice");
+		assertThat(compte.getSolde()).isEqualByComparingTo("100.00");
+		assertThat(compte.getDecouvertAutorise()).isEqualByComparingTo("0");
+	}
+
 	@ParameterizedTest
 	@NullSource
 	@ValueSource(strings = {"-0.01", "0.00"})
