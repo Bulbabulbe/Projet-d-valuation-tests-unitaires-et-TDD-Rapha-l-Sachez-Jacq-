@@ -80,6 +80,7 @@ class VirementServiceImplTest {
 		// Act / Assert
 		assertThatExceptionOfType(CompteIntrouvableException.class)
 				.isThrownBy(() -> service.virer("FR001", "FR002", BigDecimal.ONE));
+		verify(repository, never()).sauvegarder(any());
 	}
 
 	@Test
@@ -92,6 +93,8 @@ class VirementServiceImplTest {
 		// Act / Assert
 		assertThatExceptionOfType(CompteIntrouvableException.class)
 				.isThrownBy(() -> service.virer("FR001", "FR002", BigDecimal.ONE));
+		verify(repository, never()).sauvegarder(any());
+		assertThat(source.getSolde()).isEqualByComparingTo("100.00");
 	}
 
 	@Test
